@@ -1,0 +1,42 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 512 512">
+  <defs>
+    <radialGradient id="bg512" cx="35%" cy="30%" r="70%">
+      <stop offset="0%" stop-color="#1a1a2e"/>
+      <stop offset="100%" stop-color="#0a0a12"/>
+    </radialGradient>
+    <filter id="glow512">
+      <feGaussianBlur stdDeviation="6" result="blur"/>
+      <feMerge><feMergeNode in="blur"/><feMergeNode in="SourceGraphic"/></feMerge>
+    </filter>
+  </defs>
+
+  <!-- Background -->
+  <rect width="512" height="512" rx="112" fill="url(#bg512)"/>
+
+  <!-- Subtle inner border -->
+  <rect x="2" y="2" width="508" height="508" rx="111"
+        fill="none" stroke="rgba(255,255,255,0.04)" stroke-width="2"/>
+
+  <!-- Paper plane — left wing (brighter) -->
+  <path d="M396,94 L72,372 L232,284 Z" fill="#e94560"/>
+
+  <!-- Paper plane — right wing / body (darker) -->
+  <path d="M396,94 L312,436 L232,284 Z" fill="#b02040"/>
+
+  <!-- Fold crease highlight -->
+  <path d="M396,94 L232,284" stroke="#ff6080" stroke-width="3" stroke-linecap="round" opacity="0.6"/>
+
+  <!-- Tail flick -->
+  <path d="M232,284 L196,354 L216,278 Z" fill="#ff7090"/>
+
+  <!-- Contrail / speed lines -->
+  <line x1="148" y1="392" x2="108" y2="428" stroke="#e94560" stroke-width="4"
+        stroke-linecap="round" opacity="0.35"/>
+  <line x1="124" y1="398" x2="92"  y2="426" stroke="#e94560" stroke-width="3"
+        stroke-linecap="round" opacity="0.2"/>
+  <line x1="100" y1="404" x2="76"  y2="424" stroke="#e94560" stroke-width="2"
+        stroke-linecap="round" opacity="0.1"/>
+
+  <!-- Glow on nose -->
+  <circle cx="396" cy="94" r="18" fill="#e94560" opacity="0.25" filter="url(#glow512)"/>
+</svg>

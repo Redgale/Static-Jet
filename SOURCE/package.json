@@ -1,0 +1,25 @@
+{
+  "name": "scramjet-proxy",
+  "version": "1.0.0",
+  "private": true,
+  "scripts": {
+    "dev": "npm run build:sw && next dev",
+    "build": "npm run build:sw && next build",
+    "build:sw": "vite build --config vite.sw.config.ts",
+    "start": "next start",
+    "export": "npm run build"
+  },
+  "dependencies": {
+    "next": "^15.3.4",
+    "react": "^19.0.0",
+    "react-dom": "^19.0.0",
+    "@mercuryworkshop/libcurl-transport": "^2.0.5"
+  },
+  "devDependencies": {
+    "@types/node": "^24.0.0",
+    "@types/react": "^19.0.0",
+    "@types/react-dom": "^19.0.0",
+    "typescript": "^5.8.3",
+    "vite": "^6.3.5"
+  }
+}
