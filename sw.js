@@ -1,1 +1,0 @@
-importScripts("/controller/controller.sw.js");(function(){"use strict";self.addEventListener("fetch",e=>{const t=e;$scramjetController.shouldRoute(t)&&t.respondWith($scramjetController.route(t))})})();
