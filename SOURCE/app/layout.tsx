@@ -17,8 +17,8 @@ export const metadata: Metadata = {
     title: "Static Jet",
   },
   icons: {
-    icon: "/icons/favicon.svg",
-    apple: "/icons/apple-touch-icon.svg",
+    icon: "/icons/favicon.png",
+    apple: "/icons/apple-touch-icon.png",
   },
 };
 

@@ -4,10 +4,11 @@
   "private": true,
   "scripts": {
     "dev": "npm run build:sw && next dev",
-    "build": "npm run build:sw && next build",
+    "build": "npm run build:sw && next build && node scripts/generate-precache.js",
     "build:sw": "vite build --config vite.sw.config.ts",
     "start": "next start",
-    "export": "npm run build"
+    "export": "npm run build",
+    "generate-icons": "node scripts/generate-icons.js"
   },
   "dependencies": {
     "next": "^15.3.4",
