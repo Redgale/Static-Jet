@@ -101,6 +101,8 @@ declare global {
 export default function ProxyApp() {
   const iframeRef  = useRef<HTMLIFrameElement>(null);
   const frameRef   = useRef<ScramjetFrame | null>(null);
+  const observerRef = useRef<MutationObserver | null>(null);
+  const lastGoodSrc  = useRef<string>("");
   const rawCtrlRef = useRef<{
     createFrame(el: HTMLIFrameElement): ScramjetFrame;
     setTransport(t: unknown): void;
@@ -123,6 +125,30 @@ export default function ProxyApp() {
     () => (getSavedWisp() === DEFAULT_WISP ? "" : getSavedWisp())
   );
   const [wispStatus, setWispStatus] = useState("");
+
+
+  // ── Iframe src guard ────────────────────────────────────────────────────────
+  // Watches the iframe element for direct src attribute edits (e.g. via
+  // DevTools) and resets to the last known good proxy URL.
+  // Note: a determined attacker with console access can disconnect this —
+  // the SW allowlist is the real enforcement layer.
+  const attachSrcGuard = useCallback((el: HTMLIFrameElement) => {
+    observerRef.current?.disconnect();
+    const observer = new MutationObserver((mutations) => {
+      for (const m of mutations) {
+        if (m.attributeName !== "src") continue;
+        const current = el.getAttribute("src") ?? "";
+        if (!current.startsWith("/~/sj/") && lastGoodSrc.current) {
+          console.warn("[StaticJet] iframe src tamper detected — resetting");
+          el.setAttribute("src", lastGoodSrc.current);
+        } else if (current.startsWith("/~/sj/")) {
+          lastGoodSrc.current = current;
+        }
+      }
+    });
+    observer.observe(el, { attributes: true, attributeFilter: ["src"] });
+    observerRef.current = observer;
+  }, []);
 
   // ── Boot ──────────────────────────────────────────────────────────────────
   useEffect(() => { boot(getSavedWisp()); }, []); // eslint-disable-line
@@ -213,9 +239,12 @@ export default function ProxyApp() {
     setSettingsOpen(false);
     const ctrl = rawCtrlRef.current;
     if (!ctrl || !iframeRef.current) return;
-    if (!frameRef.current) frameRef.current = ctrl.createFrame(iframeRef.current);
+    if (!frameRef.current) {
+      frameRef.current = ctrl.createFrame(iframeRef.current);
+      attachSrcGuard(iframeRef.current);
+    }
     frameRef.current.go(target);
-  }, [goHome]);
+  }, [goHome, attachSrcGuard]);
 
   const handleKeyDown = useCallback((e: KeyboardEvent<HTMLInputElement>) => {
     if (e.key === "Enter") navigate(urlInput);
@@ -225,6 +254,9 @@ export default function ProxyApp() {
     try {
       const win = iframeRef.current?.contentWindow;
       if (!win) return;
+      // Track the last good proxy src for the tamper observer
+      const src = iframeRef.current?.getAttribute("src") ?? "";
+      if (src.startsWith("/~/sj/")) lastGoodSrc.current = src;
       const real = decodeProxyHref(win.location.href);
       if (real) setUrlInput(real);
     } catch {}
@@ -233,6 +265,9 @@ export default function ProxyApp() {
   const goBack    = useCallback(() => frameRef.current?.back(),    []);
   const goForward = useCallback(() => frameRef.current?.forward(), []);
   const reload    = useCallback(() => frameRef.current?.reload(),  []);
+
+  // Disconnect observer on unmount
+  useEffect(() => () => { observerRef.current?.disconnect(); }, []);
 
   const isReady = phase === "ready";
 
